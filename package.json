@@ -1,0 +1,24 @@
+{
+  "name": "builder-sql",
+  "version": "1.0.0",
+  "description": "node mysql builder",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/panhc/builder-sql.git"
+  },
+  "keywords": [
+    "node",
+    "sql",
+    "builder"
+  ],
+  "author": "haven",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/panhc/builder-sql/issues"
+  },
+  "homepage": "https://github.com/panhc/builder-sql#readme"
+}
