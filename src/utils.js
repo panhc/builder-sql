@@ -13,6 +13,22 @@ class Utils {
         return isjson;
     }
 
+    isFunction(fn){
+        return typeof fn === 'function';
+    }
+
+    isString(str){
+        return typeof str === 'string';
+    }
+
+    isArray(arr){
+        return Array.isArray(arr);
+    }
+
+    isEmpty(obj){
+        return Object.keys(obj).length === 0;
+    }
+
 
 }
 
