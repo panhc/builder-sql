@@ -9,6 +9,7 @@ class Builder {
             table: tableName,
             operate: 'select',
             fields: ['*'],
+            insertOrUpdateObj: {},
             wheres: {
                 and: [],
                 or: []
@@ -135,6 +136,25 @@ class Builder {
         return this.toSql();
     }
 
+    create(obj){
+        //接受一个对象类型
+        this._query.operate = 'insert';
+        this._query.insertOrUpdateObj = obj;
+        return this.toSql();
+    }
+
+    update(obj){
+        //接受一个对象类型
+        this._query.operate = 'update';
+        this._query.insertOrUpdateObj = obj;
+        return this.toSql();
+    }
+
+    delete(){
+        this._query.operate = 'delete';
+        return this.toSql();
+    }
+
     toSql(){
         let q = [];
 
@@ -143,14 +163,17 @@ class Builder {
                 q.push('select',this._query.fields.join(','),'from',this._query.table);
                 break;
             case 'delete':
-
+                q.push(`delete from ${this._query.table}`);
                 break;
             case 'update':
-
+                let opArr = [];
+                for(let key in this._query.insertOrUpdateObj){
+                    opArr.push(`${key}=${this._query.insertOrUpdateObj[key]}`);
+                }
+                q.push(`update ${this._query.table} set ${opArr.join(',')}`);
                 break;
             case 'insert':
-
-                break;
+                return `insert into ${this._query.table} set (${Object.keys(this._query.insertOrUpdateObj).join(',')}) values (${Object.values(this._query.insertOrUpdateObj).join(',')});`;
         }
 
         (this._query.wheres.and.length || this._query.wheres.or.length) && q.push('where');
@@ -184,13 +207,7 @@ class Builder {
 }
 
 if(require.main === module){
-    let l = new Builder('actions')
-        .whereIn('id',[10,20])
-        .orWhere({age:10,name:'tom'})
-        .offset(10)
-        .limit(5)
-        .orderBy(['name','age'])
-        .toSql();
+    let l = new Builder('actions').where({'name':'phc','age':20}).update({'name':'phc','age':30});
 
     console.log(l);
 }
