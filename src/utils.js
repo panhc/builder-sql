@@ -18,7 +18,7 @@ class Utils {
     }
 
     isString(str){
-        return typeof str === 'string';
+        return str && typeof str === 'string';
     }
 
     isArray(arr){

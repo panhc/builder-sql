@@ -10,6 +10,11 @@ class Builder {
             operate: 'select',
             fields: ['*'],
             insertOrUpdateObj: {},
+            join: {
+                mode: '',
+                tName: ''
+            },
+            on: '',
             wheres: {
                 and: [],
                 or: []
@@ -18,6 +23,7 @@ class Builder {
             skip: 0,
             take: null
         };
+        this.result = null;
     }
 
     select(params){
@@ -155,12 +161,56 @@ class Builder {
         return this.toSql();
     }
 
+    join(tName,mode = ''){
+        this._query.join.mode = mode;
+        this._query.join.tName = tName;
+        return this;
+    }
+
+    leftJoin(tName){
+        this.join.call(this,tName,'left');
+        return this;
+    }
+
+    rightJoin(tName){
+        this.join.call(this,tName,'right');
+        return this;
+    }
+
+    innerJoin(tName){
+        this.join.call(this,tName,'inner');
+        return this;
+    }
+
+    fullJoin(tName){
+        this.join.call(this,tName,'full');
+        return this;
+    }
+
+    on(...params){
+        switch (params.length){
+            case 1:
+                this._query.on = params[0];
+                break;
+            case 2:
+                this._query.on = `${params[0]} = ${params[1]}`;
+                break;
+            case 3:
+                this._query.on = params.join(' ');
+                break;
+            default:
+                throw Error('unknow params');
+        }
+
+        return this;
+    }
+
     toSql(){
         let q = [];
 
         switch (this._query.operate){
             case 'select':
-                q.push('select',this._query.fields.join(','),'from',this._query.table);
+                q.push('select',[...new Set(this._query.fields)].join(','),'from',this._query.table);
                 break;
             case 'delete':
                 q.push(`delete from ${this._query.table}`);
@@ -173,9 +223,15 @@ class Builder {
                 q.push(`update ${this._query.table} set ${opArr.join(',')}`);
                 break;
             case 'insert':
-                return `insert into ${this._query.table} set (${Object.keys(this._query.insertOrUpdateObj).join(',')}) values (${Object.values(this._query.insertOrUpdateObj).join(',')});`;
+                this.result = `insert into ${this._query.table} set (${Object.keys(this._query.insertOrUpdateObj).join(',')}) values (${Object.values(this._query.insertOrUpdateObj).join(',')});`;
+                return this;
+        }
+        //处理join语句块
+        if(this._query.join.tName && this._query.on){
+            q.push(`${this._query.join.mode} join ${this._query.join.tName} on ${this._query.on}`);
         }
 
+        //处理where语句块
         (this._query.wheres.and.length || this._query.wheres.or.length) && q.push('where');
         this._query.wheres.and.length && q.push(`${this._query.wheres.and.join(' and ')}`);
 
@@ -189,6 +245,7 @@ class Builder {
             }
         }
 
+        //处理 order
         if(!_utils.isEmpty(this._query.orders)){
             q.push('order by');
             let _orderArr = [];
@@ -198,16 +255,20 @@ class Builder {
             q.push(_orderArr.join(','));
         }
 
+        //处理分页
         if(this._query.take){
            q.push(`limit ${this._query.skip},${this._query.take}`);
         }
 
-        return q.join(' ');
+        q.push(';');
+        this.result = q.join(' ');
+        return this;
     }
+    
 }
 
 if(require.main === module){
-    let l = new Builder('actions').where({'name':'phc','age':20}).update({'name':'phc','age':30});
+    let l = new Builder('actions').leftJoin('flows').on('flows.id','actions.flow_id').get();
 
     console.log(l);
 }
