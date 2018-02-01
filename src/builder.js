@@ -123,13 +123,15 @@ class Builder {
     all(){
         this._query.operate = 'select';
         this._query.fields = ['*'];
-        return this.toSql();
+        this.result = this.toSql();
+        return this;
     }
 
     get(params = []){
         params.length && (this._query.fields = params);
 
-        return this.toSql();
+        this.result = this.toSql();
+        return this;
     }
 
     find(id){
@@ -138,27 +140,30 @@ class Builder {
         }
 
         this._query.wheres.and = [...this._query.wheres.and,`id = ${id}`];
-
-        return this.toSql();
+        this.result = this.toSql();
+        return this;
     }
 
     create(obj){
         //接受一个对象类型
         this._query.operate = 'insert';
         this._query.insertOrUpdateObj = obj;
-        return this.toSql();
+        this.result = this.toSql();
+        return this;
     }
 
     update(obj){
         //接受一个对象类型
         this._query.operate = 'update';
         this._query.insertOrUpdateObj = obj;
-        return this.toSql();
+        this.result = this.toSql();
+        return this;
     }
 
     delete(){
         this._query.operate = 'delete';
-        return this.toSql();
+        this.result = this.toSql();
+        return this;
     }
 
     join(tName,mode = ''){
@@ -260,15 +265,12 @@ class Builder {
            q.push(`limit ${this._query.skip},${this._query.take}`);
         }
 
-        q.push(';');
-        this.result = q.join(' ');
-        return this;
+        return q.join(' ');
     }
-    
 }
 
 if(require.main === module){
-    let l = new Builder('actions').leftJoin('flows').on('flows.id','actions.flow_id').get();
+    let l = new Builder('actions').leftJoin('flows').on('flows.id','actions.flow_id').get().toSql();
 
     console.log(l);
 }
