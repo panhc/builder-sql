@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/panhc/builder-sql/issues"
   },
-  "homepage": "https://github.com/panhc/builder-sql#readme"
+  "homepage": "https://github.com/panhc/builder-sql#readme",
+  "dependencies": {
+    "mysql": "^2.15.0"
+  }
 }
