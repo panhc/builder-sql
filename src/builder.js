@@ -21,7 +21,8 @@ class Builder {
             },
             orders: {},
             skip: 0,
-            take: null
+            take: null,
+	          groupBy: null
         };
         this.result = null;
     }
@@ -74,26 +75,26 @@ class Builder {
         return this;
     };
 
-    whereBetween(filed,value1,value2){
-        this._query.wheres.and.push(`${filed} between ${value1} and ${value2}`);
+    whereBetween(column,value1,value2){
+        this._query.wheres.and.push(`${column} between ${value1} and ${value2}`);
         return this;
     }
 
-    whereIn(field,arr){
-        this._query.wheres.and.push(`${field} in ( ${arr.join(',')} )`);
+    whereIn(column,arr){
+        this._query.wheres.and.push(`${column} in ( ${arr.join(',')} )`);
         return this;
     }
 
-    orderBy(field,mode = 'asc'){
-        if(_utils.isString(field)){
-            this._query.orders[field] = mode;
+    orderBy(column,mode = 'asc'){
+        if(_utils.isString(column)){
+            this._query.orders[column] = mode;
         }
-        if(_utils.isJson(field)){
-            this._query.orders = Object.assign({},this._query.orders,field);
+        if(_utils.isJson(column)){
+            this._query.orders = Object.assign({},this._query.orders,column);
         }
-        if(_utils.isArray(field)){
+        if(_utils.isArray(column)){
             let _query = {};
-            field.forEach(item=>{
+	        column.forEach(item=>{
                 _query[item] = mode;
             })
             this._query.orders = Object.assign({},this._query.orders,_query);
@@ -210,6 +211,41 @@ class Builder {
         return this;
     }
 
+    groupBy(column){
+    	  this._query.groupBy = column;
+    	  return this;
+    }
+
+    distinct(column){
+    	  this._query.fields = [`distinct ${column}`];
+    	  return this;
+    }
+
+    count(){
+    	  this._query.fields = [`count(*)`];
+    	  return this;
+    }
+
+    avg(column){
+		    this._query.fields = [`avg(${column})`];
+		    return this;
+    }
+
+    sum(column){
+	    this._query.fields = [`sum(${column})`];
+	    return this;
+    }
+
+    max(column){
+	    this._query.fields = [`max(${column})`];
+	    return this;
+    }
+
+    min(column){
+	    this._query.fields = [`min(${column})`];
+	    return this;
+    }
+
     toSql(){
         let q = [];
 
@@ -250,6 +286,10 @@ class Builder {
             }
         }
 
+        if(this._query.groupBy){
+        	  q.push(`group by ${this._query.groupBy}`);
+        }
+
         //处理 order
         if(!_utils.isEmpty(this._query.orders)){
             q.push('order by');
@@ -270,7 +310,7 @@ class Builder {
 }
 
 if(require.main === module){
-    let l = new Builder('actions').leftJoin('flows').on('flows.id','actions.flow_id').get().toSql();
+    let l = new Builder('actions').leftJoin('flows').on('flows.id','actions.flow_id').max('name').get().toSql();
 
     console.log(l);
 }
