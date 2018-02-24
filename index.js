@@ -135,12 +135,12 @@ class Builder {
 		return this;
 	}
 
-	find(id) {
+	find(id, keyName = 'id') {
 		if (typeof id !== 'string' || typeof id !== 'number') {
 			throw Error('id should be table key');
 		}
 
-		this._query.wheres.and = [...this._query.wheres.and, `id = ${id}`];
+		this._query.wheres.and = [...this._query.wheres.and, `${keyName} = ${id}`];
 		this.result = this.toSql();
 		return this;
 	}
@@ -309,7 +309,7 @@ class Builder {
 	}
 }
 
-
+module.exports = Builder;
 
 
 

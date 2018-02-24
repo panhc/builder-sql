@@ -1,5 +1,5 @@
 {
-  "name": "builder-sql",
+  "name": "chain-mysql-builder",
   "version": "1.0.0",
   "description": "node mysql builder",
   "main": "index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/panhc/builder-sql.git"
+    "url": "git+https://github.com/panhc/chain-mysql-builder.git"
   },
   "keywords": [
     "node",
@@ -18,8 +18,8 @@
   "author": "haven",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/panhc/builder-sql/issues"
+    "url": "https://github.com/panhc/chain-mysql-builder/issues"
   },
-  "homepage": "https://github.com/panhc/builder-sql#readme",
+  "homepage": "https://github.com/panhc/chain-mysql-builder#readme",
   "dependencies": {}
 }
