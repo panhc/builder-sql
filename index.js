@@ -51,13 +51,18 @@ class Builder {
 				} else if (_utils.isJson(_q)) {
 					let _wheres = [];
 					for (let key in _q) {
-						_wheres.push(`${key} = ${_q[key]}`);
+						if(typeof _q[key] === 'string'){
+							_wheres.push(`${key} = '${_q[key]}'`);
+						}else{
+							_wheres.push(`${key} = ${_q[key]}`);
+						}
 					}
 					this._query.wheres[this._whereStatus] = [...this._query.wheres[this._whereStatus], ..._wheres];
 				}
 				break;
 			case 2:
-				this._query.wheres[this._whereStatus] = [...this._query.wheres[this._whereStatus], `${params[0]} = ${params[1]}`];
+				let value = typeof params[1] === 'string' ? `'${params[1]}'` : params[1];
+				this._query.wheres[this._whereStatus] = [...this._query.wheres[this._whereStatus], `${params[0]} = ${value}`];
 				break;
 			case 3:
 				this._query.wheres[this._whereStatus] = [...this._query.wheres[this._whereStatus], params.join(' ')];
@@ -81,6 +86,9 @@ class Builder {
 	}
 
 	whereIn(column, arr) {
+		arr = arr.map(item=>{
+			return typeof item === 'string' ? `'${item}'` : item;
+		});
 		this._query.wheres.and.push(`${column} in ( ${arr.join(',')} )`);
 		return this;
 	}
@@ -115,6 +123,12 @@ class Builder {
 
 	offset(num) {
 		return this.skip.call(this, num)
+	}
+
+	first(){
+		this._query.skip = 0;
+		this._query.take = 1;
+		return this;
 	}
 
 	limit(num) {
